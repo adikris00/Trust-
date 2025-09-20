@@ -760,8 +760,8 @@ async def check_subscriptions():
                 )
                 
                 try:
-                    # Get bot instance from global context
-                    from main import application
+                    # Import application from global scope
+                    global application
                     bot = application.bot
                     await bot.send_message(user_id, notification_text)
                     logger.info(f"Notification sent to user {user_id} for domain {domain}")
@@ -800,7 +800,7 @@ def setup_scheduler(app):
 # --- Main Application ---
 application = None
 
-async def main():
+def main():
     global application
     print("🚀 Enhanced Domain Checker Bot sedang berjalan...")
     
@@ -827,10 +827,7 @@ async def main():
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, check_domain))
     
     # Run the bot
-    await application.run_polling()
+    application.run_polling()
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        logger.info("Bot stopped by user")
+    main()
