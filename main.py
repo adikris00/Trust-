@@ -761,6 +761,7 @@ async def check_subscriptions():
                 
                 try:
                     # Get bot instance from global context
+                    from main import application
                     bot = application.bot
                     await bot.send_message(user_id, notification_text)
                     logger.info(f"Notification sent to user {user_id} for domain {domain}")
