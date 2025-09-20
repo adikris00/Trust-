@@ -4,7 +4,7 @@ import requests
 import asyncio
 import csv
 import io
-from datetime import datetime, timedelta
+from datetime import datetime
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -792,14 +792,6 @@ def setup_scheduler(app):
         replace_existing=True
     )
     
-    # You can also add hourly checks if needed
-    # scheduler.add_job(
-    #     check_subscriptions,
-    #     CronTrigger(minute=0),  # Every hour
-    #     id='hourly_domain_check',
-    #     replace_existing=True
-    # )
-    
     scheduler.start()
     logger.info("Background scheduler started")
     return scheduler
@@ -807,7 +799,8 @@ def setup_scheduler(app):
 # --- Main Application ---
 application = None
 
-if __name__ == "__main__":
+async def main():
+    global application
     print("🚀 Enhanced Domain Checker Bot sedang berjalan...")
     
     # Initialize database
@@ -832,11 +825,11 @@ if __name__ == "__main__":
     application.add_handler(CallbackQueryHandler(button_callback))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, check_domain))
     
+    # Run the bot
+    await application.run_polling()
+
+if __name__ == "__main__":
     try:
-        # Run the bot
-        application.run_polling()
+        asyncio.run(main())
     except KeyboardInterrupt:
         logger.info("Bot stopped by user")
-    finally:
-        scheduler.shutdown()
-        logger.info("Scheduler shut down")
