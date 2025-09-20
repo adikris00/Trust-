@@ -615,7 +615,13 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     
     user = update.effective_user
-    action, domain = query.data.split('_', 1)
+    data_parts = query.data.split('_', 1)
+    
+    if len(data_parts) < 2:
+        await query.edit_message_text("❌ Data callback tidak valid")
+        return
+        
+    action, domain = data_parts
     
     if action == "recheck":
         # Recheck domain
@@ -799,6 +805,7 @@ def setup_scheduler(app):
     return scheduler
 
 # --- Main Application ---
+application = None
 
 if __name__ == "__main__":
     print("🚀 Enhanced Domain Checker Bot sedang berjalan...")
