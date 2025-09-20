@@ -754,7 +754,9 @@ async def check_subscriptions():
                 )
                 
                 try:
-                    await context.bot.send_message(user_id, notification_text)
+                    # Get bot instance from global context
+                    bot = application.bot
+                    await bot.send_message(user_id, notification_text)
                     logger.info(f"Notification sent to user {user_id} for domain {domain}")
                 except Exception as e:
                     logger.error(f"Failed to send notification to user {user_id}: {e}")
@@ -806,30 +808,26 @@ if __name__ == "__main__":
     logger.info("Database initialized")
     
     # Build application
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    application = ApplicationBuilder().token(BOT_TOKEN).build()
     
     # Setup scheduler for background monitoring
-    scheduler = setup_scheduler(app)
+    scheduler = setup_scheduler(application)
     
     # Add handlers
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CommandHandler("history", history_command))
-    app.add_handler(CommandHandler("bookmarks", bookmarks_command))
-    app.add_handler(CommandHandler("subscriptions", subscriptions_command))
-    app.add_handler(CommandHandler("stats", stats_command))
-    app.add_handler(CommandHandler("export", export_command))
-    app.add_handler(CommandHandler("report", report_command))
-    app.add_handler(CallbackQueryHandler(button_callback))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, check_domain))
-    
-    # Global context for background tasks
-    global context
-    context = app
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("history", history_command))
+    application.add_handler(CommandHandler("bookmarks", bookmarks_command))
+    application.add_handler(CommandHandler("subscriptions", subscriptions_command))
+    application.add_handler(CommandHandler("stats", stats_command))
+    application.add_handler(CommandHandler("export", export_command))
+    application.add_handler(CommandHandler("report", report_command))
+    application.add_handler(CallbackQueryHandler(button_callback))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, check_domain))
     
     try:
         # Run the bot
-        app.run_polling()
+        application.run_polling()
     except KeyboardInterrupt:
         logger.info("Bot stopped by user")
     finally:
