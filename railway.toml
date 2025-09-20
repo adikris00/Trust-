@@ -2,3 +2,4 @@
 
 [deploy]
 startCommand = "python main.py"
+restartPolicyType = "ON_FAILURE"
